@@ -118,11 +118,11 @@ The Bitcoin payment page is now displayed, offering the payer the option to pay 
 == Upgrade Notice ==
 
 Follow updates on plugin's GitHub page:
-https://github.com/Coinsnap/coinsnap-woocommerce/
+https://github.com/Coinsnap/Coinsnap-for-Gravityform/
 
 == Frequently Asked Questions ==
 
-Plugin's page on Coinsnap website: https://coinsnap.io/en/coinsnap-woocommerce-plugin/
+Plugin's page on Coinsnap website: https://coinsnap.io/en/
 
 == Screenshots ==
 
