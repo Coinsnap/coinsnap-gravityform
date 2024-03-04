@@ -1,4 +1,4 @@
-=== Coinsnap Bitcoin + Lightning payment plug-in 1.0.0 ===
+=== Coinsnap Bitcoin + Lightning payment plug-in for Gravity form 1.0.0 ===
 Contributors: coinsnap
 Tags: Lightning, SATS, bitcoin, Gravity form, payment gateway
 Requires at least: 5.2
@@ -80,28 +80,14 @@ https://coinsnap.io/lightning-wallet-mit-lightning-adresse/
 
 ### 3. Connect Coinsnap account with Gravity form add-on ###
 
-### 3.1. WooCommerce Coinsnap Settings ###
+### 3.1. Gravity form Coinsnap Settings ###
 
 * Navigate to Forms > Settings and select coinsnap
 * Enter Store ID and API Key
 * Click Setting Save
 * Navigate to Forms > New Forms > Settings > Coinsnap > Add New Feeds and Save Settings
 
-### 3.2. WooCommerce Payment Settings ###
-
-In the WooCommerce settings in the tab Payment you get an overview of all payment methods stored in WooCommerce. At the very bottom is Coinsnap.
-
-Here Coinsnap must be activated as a payment method and further settings can be made via the Finish set up or Manage button.
-
-### 3.3. Payment settings ###
-
-After clicking the Finish set up or Manage button, you will get to the detail settings.
-
-Changes can be made here, which will be displayed to the payer during the payment process.
-
-The Title field contains the entry for the payment methods. Here, for example, the settings for “Bitcoin and Lightning” can be made.
-
-A note can be entered in the Customer Message field for the payer to know what to do next.
+### 3.2. Payment settings ###
 
 ### 4. Test payment ###
 
@@ -111,9 +97,9 @@ After all the settings have been made, a test payment should be made.
 
 We make a real donation payment in our test Gravity form site.
 
-### 4.2. Bitcoin payment page ###
+### 4.2. Bitcoin + Lightning payment page ###
 
-The Bitcoin payment page is now displayed, offering the payer the option to pay with Bitcoin or also with Lightning. Both methods are integrated in the displayed QR code.
+The Bitcoin + Lightning payment page is now displayed, offering the payer the option to pay with Bitcoin or also with Lightning. Both methods are integrated in the displayed QR code.
 
 == Upgrade Notice ==
 
