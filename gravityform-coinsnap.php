@@ -2,13 +2,12 @@
 /*
  * Plugin Name:     Gravity Forms Coinsnap Add-On
  * Plugin URI:      https://www.coinsnap.io
- * Description:     Integrates Gravity Forms with Coinsnap.
- * Version:         1.1
+ * Description:     Provides a <a href="https://coinsnap.io">Coinsnap</a>  - Bitcoin + Lightning Payment Gateway for Gravity Forms Wordpress Plugin.
+ * Version:         1.0.0
  * Author:          Coinsnap
  * Author URI:      https://coinsnap.io/
  * Text Domain:     coinsnap-for-gravityform
  * Domain Path:     /languages
- * Version:         1.0.0
  * Requires PHP:    7.4
  * Tested up to:    6.4.3
  * Requires at least: 5.2
@@ -17,6 +16,8 @@
  *
  * Network:         true
  */ 
+
+if (!defined( 'ABSPATH' )) exit;
 
 define( 'SERVER_PHP_VERSION', '7.4' );
 define( 'COINSNAP_VERSION', '1.0.0' );
