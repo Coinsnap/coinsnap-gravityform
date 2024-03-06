@@ -1,11 +1,6 @@
 <?php
 
 GFForms::include_payment_addon_framework();
-define( 'SERVER_PHP_VERSION', '7.4' );
-define( 'COINSNAP_VERSION', '1.0.0' );
-define( 'COINSNAP_REFERRAL_CODE', '' );
-define( 'COINSNAP_PLUGIN_ID', 'coinsnap-for-gravityform' );
-define( 'COINSNAP_SERVER_URL', 'https://app.coinsnap.io' );
 
 class GFCoinsnap extends GFPaymentAddOn {
     
