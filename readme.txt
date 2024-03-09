@@ -1,4 +1,4 @@
-=== Coinsnap Bitcoin + Lightning payment plug-in for Gravity form 1.0.0 ===
+=== Coinsnap Bitcoin + Lightning payment plug-in 1.0.0 for Gravity form ===
 Contributors: coinsnap
 Tags: Lightning, SATS, bitcoin, Gravity form, payment gateway
 Requires at least: 5.2
@@ -86,8 +86,6 @@ https://coinsnap.io/lightning-wallet-mit-lightning-adresse/
 * Enter Store ID and API Key
 * Click Setting Save
 * Navigate to Forms > New Forms > Settings > Coinsnap > Add New Feeds and Save Settings
-
-### 3.2. Payment settings ###
 
 ### 4. Test payment ###
 
