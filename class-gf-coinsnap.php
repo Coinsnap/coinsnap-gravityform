@@ -433,7 +433,7 @@ class GFCoinsnap extends GFPaymentAddOn {
         );
         $wpdb->query($sql);*/
         
-        $wpdb->update("$wpdb->prefix}rg_lead_meta", array('meta_value' => $new_feed_id), array('meta_key' => 'coinsnap_feed_id','meta_value' => $old_feed_id),array('%s'),array('%s','%s'));
+        $wpdb->update("{$wpdb->prefix}rg_lead_meta", array('meta_value' => $new_feed_id), array('meta_key' => 'coinsnap_feed_id','meta_value' => $old_feed_id),array('%s'),array('%s','%s'));
     }
 
     
@@ -445,7 +445,7 @@ class GFCoinsnap extends GFPaymentAddOn {
             $this->_slug
         );
         $wpdb->query($sql);*/
-        $wpdb->update("$wpdb->prefix}rg_lead_meta", array('meta_value' => $this->_slug), array('meta_key' => 'payment_gateway','meta_value' => 'coinsnap'),array('%s'),array('%s','%s'));
+        $wpdb->update("{$wpdb->prefix}rg_lead_meta", array('meta_value' => $this->_slug), array('meta_key' => 'payment_gateway','meta_value' => 'coinsnap'),array('%s'),array('%s','%s'));
     }
 
     
