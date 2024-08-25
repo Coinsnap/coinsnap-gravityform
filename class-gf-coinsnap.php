@@ -423,29 +423,17 @@ class GFCoinsnap extends GFPaymentAddOn {
 
         
     
-    public function update_feed_id($old_feed_id, $new_feed_id)
-    {
-        global $wpdb;/*
-        $sql = $wpdb->prepare(
-            "UPDATE {$wpdb->prefix}rg_lead_meta SET meta_value=%s WHERE meta_key='coinsnap_feed_id' AND meta_value=%s",
-            $new_feed_id,
-            $old_feed_id
-        );
-        $wpdb->query($sql);*/
-        
-        $wpdb->update("{$wpdb->prefix}rg_lead_meta", array('meta_value' => $new_feed_id), array('meta_key' => 'coinsnap_feed_id','meta_value' => $old_feed_id),array('%s'),array('%s','%s'));
+    public function update_feed_id($old_feed_id, $new_feed_id){
+        global $wpdb;
+        $wpdb->query($wpdb->prepare("UPDATE {$wpdb->prefix}rg_lead_meta SET meta_value=%s WHERE meta_key='coinsnap_feed_id' AND meta_value=%s",$new_feed_id,$old_feed_id));
+        //$wpdb->update("{$wpdb->prefix}rg_lead_meta", array('meta_value' => $new_feed_id), array('meta_key' => 'coinsnap_feed_id','meta_value' => $old_feed_id),array('%s'),array('%s','%s'));
     }
 
     
-    public function update_payment_gateway()
-    {
-        global $wpdb;/*
-        $sql = $wpdb->prepare(
-            "UPDATE {$wpdb->prefix}rg_lead_meta SET meta_value=%s WHERE meta_key='payment_gateway' AND meta_value='coinsnap'",
-            $this->_slug
-        );
-        $wpdb->query($sql);*/
-        $wpdb->update("{$wpdb->prefix}rg_lead_meta", array('meta_value' => $this->_slug), array('meta_key' => 'payment_gateway','meta_value' => 'coinsnap'),array('%s'),array('%s','%s'));
+    public function update_payment_gateway(){
+        global $wpdb;
+        $wpdb->query($wpdb->prepare("UPDATE {$wpdb->prefix}rg_lead_meta SET meta_value=%s WHERE meta_key='payment_gateway' AND meta_value='coinsnap'", $this->_slug ));
+        //$wpdb->update("{$wpdb->prefix}rg_lead_meta", array('meta_value' => $this->_slug), array('meta_key' => 'payment_gateway','meta_value' => 'coinsnap'),array('%s'),array('%s','%s'));
     }
 
     
