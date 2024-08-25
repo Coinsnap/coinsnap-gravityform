@@ -5,7 +5,7 @@ GFForms::include_payment_addon_framework();
 class GFCoinsnap extends GFPaymentAddOn {
     
     private static $_instance = null;
-    protected $_version = '1.1';
+    protected $_version = '1.0.0';
     protected $_min_gravityforms_version = '1.9.3';
     protected $_slug = 'gravityforms_coinsnap';
     protected $_path = 'gravityforms_coinsnap/coinsnap.php';
@@ -197,10 +197,9 @@ class GFCoinsnap extends GFPaymentAddOn {
         $settings = $this->get_plugin_settings();
         if ( ! rgar($settings, 'gf_coinsnap_configured')) {
             return sprintf(
-                __('To get started, configure your %sCoinsnap Settings%s!', 'gravityforms_coinsnap'),
-                '<a href="' . admin_url('admin.php?page=gf_settings&subview=' . $this->_slug) . '">',
-                '</a>'
-            );
+                    /* translators: 1: Link to settings page opening tag 2: Link to settings page closing tag */
+                    esc_html__('To get started, configure your %1$sCoinsnap Settings%2$s!', 'gravityforms_coinsnap'),
+                '<a href="' . admin_url('admin.php?page=gf_settings&subview=' . $this->_slug) . '">','</a>');
         } else {
             return parent::feed_list_no_item_message();
         }
@@ -234,29 +233,23 @@ class GFCoinsnap extends GFPaymentAddOn {
 
     
 
-    public function redirect_url($feed, $submission_data, $form, $entry)
-    {        
+    public function redirect_url($feed, $submission_data, $form, $entry){        
 
         //Don't process redirect url if request is a Coinsnap return
-        if ( ! rgempty('gf_coinsnap_return', $_GET)) {            
+        //if ( ! rgempty('gf_coinsnap_return', $_GET)){
+        if(null === filter_input(INPUT_GET,'gf_coinsnap_return')){
             return false;
         }
         
         $payment_amount = $submission_data['payment_amount'];
         $currency  = rgar( $entry, 'currency' );
-        
-
-        
         $buyerEmail = $submission_data['email'];		
-        $buyerName = $submission_data['full_name'];  		
-        
-
-        $webhook_url = $this->get_webhook_url();		
-        
+        $buyerName = $submission_data['full_name'];
+        $webhook_url = $this->get_webhook_url();
 				
         if (! $this->webhookExists($this->getStoreId(), $this->getApiKey(), $webhook_url)){
             if (! $this->registerWebhook($this->getStoreId(), $this->getApiKey(),$webhook_url)) {                
-                echo (__('unable to set Webhook url.', 'gravityforms_coinsnap'));
+                echo (esc_html__('unable to set Webhook url.', 'gravityforms_coinsnap'));
                 exit;
             }
          }      
@@ -432,24 +425,27 @@ class GFCoinsnap extends GFPaymentAddOn {
     
     public function update_feed_id($old_feed_id, $new_feed_id)
     {
-        global $wpdb;
+        global $wpdb;/*
         $sql = $wpdb->prepare(
             "UPDATE {$wpdb->prefix}rg_lead_meta SET meta_value=%s WHERE meta_key='coinsnap_feed_id' AND meta_value=%s",
             $new_feed_id,
             $old_feed_id
         );
-        $wpdb->query($sql);
+        $wpdb->query($sql);*/
+        
+        $wpdb->update("$wpdb->prefix}rg_lead_meta", array('meta_value' => $new_feed_id), array('meta_key' => 'coinsnap_feed_id','meta_value' => $old_feed_id),array('%s'),array('%s','%s'));
     }
 
     
     public function update_payment_gateway()
     {
-        global $wpdb;
+        global $wpdb;/*
         $sql = $wpdb->prepare(
             "UPDATE {$wpdb->prefix}rg_lead_meta SET meta_value=%s WHERE meta_key='payment_gateway' AND meta_value='coinsnap'",
             $this->_slug
         );
-        $wpdb->query($sql);
+        $wpdb->query($sql);*/
+        $wpdb->update("$wpdb->prefix}rg_lead_meta", array('meta_value' => $this->_slug), array('meta_key' => 'payment_gateway','meta_value' => 'coinsnap'),array('%s'),array('%s','%s'));
     }
 
     
