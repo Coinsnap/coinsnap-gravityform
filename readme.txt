@@ -178,7 +178,7 @@ Plugin's page on Coinsnap website: https://coinsnap.io/en/
 
 == Screenshots ==
 
-1. Coinsnap for WPForms Add-on
+1. Coinsnap for Gravity Forms Add-on
 2. Gravity Forms Plugin for Wordpress
 3. Plugin downloading from Github repository
 4. Manual plugin installation
