@@ -1,4 +1,7 @@
 <?php
+if (!defined( 'ABSPATH' )){
+    exit;
+}
 
 GFForms::include_payment_addon_framework();
 
@@ -20,8 +23,7 @@ class GFCoinsnap extends GFPaymentAddOn {
     protected $_capabilities_uninstall = 'gravityforms_coinsnap_uninstall';
     protected $_enable_rg_autoupgrade = false;
     protected $_config= [];
-    public const WEBHOOK_EVENTS = ['New','Expired','Settled','Processing'];	 
-    
+    public const WEBHOOK_EVENTS = ['New','Expired','Settled','Processing'];
     
     public function __construct()
     {
@@ -84,12 +86,7 @@ class GFCoinsnap extends GFPaymentAddOn {
         return $feed['addon_slug'] == $coinsnap->_slug ? $feed : false;
     }
 
-
-    
-    
-
-    public static function get_config($form_id)
-    {
+    public static function get_config($form_id){
         $coinsnap = GFCoinsnap::get_instance();
         $feed    = $coinsnap->get_feeds($form_id);        
         if ( ! $feed) {
@@ -99,13 +96,13 @@ class GFCoinsnap extends GFPaymentAddOn {
         return $feed[0]; 
     }
 
-    public function init_frontend()
-    {
+    public function init_frontend(){
         parent::init_frontend();
         add_filter('gform_disable_post_creation', array($this, 'delay_post'), 10, 3);
         add_filter('gform_disable_notification', array($this, 'delay_notification'), 10, 4);
     }
-    public function billing_info_fields() {		
+    
+    public function billing_info_fields(){		
 
 		return array(
 			array(
@@ -303,11 +300,12 @@ class GFCoinsnap extends GFPaymentAddOn {
     public function return_url($form_id, $lead_id)
     {
         $pageURL     = GFCommon::is_ssl() ? 'https://' : 'http://';
-        $server_port = apply_filters('gform_coinsnap_return_url_port', $_SERVER['SERVER_PORT']);
+        $server_port = apply_filters('gform_coinsnap_return_url_port', filter_input('INPUT_SERVER','SERVER_PORT'));
         if ($server_port != '80') {
-            $pageURL .= $_SERVER['SERVER_NAME'] . ':' . $server_port . $_SERVER['REQUEST_URI'];
-        } else {
-            $pageURL .= $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+            $pageURL .= filter_input('INPUT_SERVER','SERVER_NAME') . ':' . $server_port . filter_input('INPUT_SERVER','REQUEST_URI');
+        }
+        else {
+            $pageURL .= filter_input('INPUT_SERVER','SERVER_NAME') . filter_input('INPUT_SERVER','REQUEST_URI');
         }
         $ids_query = "ids={$form_id}|{$lead_id}";
         $ids_query .= '&hash=' . wp_hash($ids_query);
@@ -425,15 +423,15 @@ class GFCoinsnap extends GFPaymentAddOn {
     
     public function update_feed_id($old_feed_id, $new_feed_id){
         global $wpdb;
-        $wpdb->query($wpdb->prepare("UPDATE {$wpdb->prefix}rg_lead_meta SET meta_value=%s WHERE meta_key='coinsnap_feed_id' AND meta_value=%s",$new_feed_id,$old_feed_id));
-        //$wpdb->update("{$wpdb->prefix}rg_lead_meta", array('meta_value' => $new_feed_id), array('meta_key' => 'coinsnap_feed_id','meta_value' => $old_feed_id),array('%s'),array('%s','%s'));
+        //$wpdb->query($wpdb->prepare("UPDATE {$wpdb->prefix}rg_lead_meta SET meta_value=%s WHERE meta_key='coinsnap_feed_id' AND meta_value=%s",$new_feed_id,$old_feed_id));
+        $wpdb->update("{$wpdb->prefix}rg_lead_meta", array('meta_value' => $new_feed_id), array('meta_key' => 'coinsnap_feed_id','meta_value' => $old_feed_id),array('%s'),array('%s','%s'));
     }
 
     
     public function update_payment_gateway(){
         global $wpdb;
-        $wpdb->query($wpdb->prepare("UPDATE {$wpdb->prefix}rg_lead_meta SET meta_value=%s WHERE meta_key='payment_gateway' AND meta_value='coinsnap'", $this->_slug ));
-        //$wpdb->update("{$wpdb->prefix}rg_lead_meta", array('meta_value' => $this->_slug), array('meta_key' => 'payment_gateway','meta_value' => 'coinsnap'),array('%s'),array('%s','%s'));
+        //$wpdb->query($wpdb->prepare("UPDATE {$wpdb->prefix}rg_lead_meta SET meta_value=%s WHERE meta_key='payment_gateway' AND meta_value='coinsnap'", $this->_slug ));
+        $wpdb->update("{$wpdb->prefix}rg_lead_meta", array('meta_value' => $this->_slug), array('meta_key' => 'payment_gateway','meta_value' => 'coinsnap'),array('%s'),array('%s','%s'));
     }
 
     
