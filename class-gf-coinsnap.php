@@ -56,7 +56,7 @@ class CoinsnapGF extends GFPaymentAddOn {
         if( wp_verify_nonce($_nonce) ){
             $response = [
                 'result' => false,
-                'message' => __('Coinsnap connection error 1 '.$this->get_webhook_url(), COINSNAP_GF_PLUGIN_SLUG)
+                'message' => __('Coinsnap connection error', COINSNAP_GF_PLUGIN_SLUG)
             ];
 
             try {
@@ -82,7 +82,7 @@ class CoinsnapGF extends GFPaymentAddOn {
                 $response['result'] = (bool)$webhook;
                 $response['message'] = $webhook 
                     ? __('Coinsnap server is connected', COINSNAP_GF_PLUGIN_SLUG)
-                    : __('Coinsnap connection error 2 '.$this->getApiKey().' - '.$this->getStoreId().' - '.$this->get_webhook_url(), COINSNAP_GF_PLUGIN_SLUG);
+                    : __('Coinsnap connection error', COINSNAP_GF_PLUGIN_SLUG);
 
             }
             catch (Exception $e) {
