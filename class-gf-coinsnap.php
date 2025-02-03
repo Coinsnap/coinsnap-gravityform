@@ -1,20 +1,17 @@
 <?php
-if (!defined( 'ABSPATH' )){
-    exit;
-}
 
 GFForms::include_payment_addon_framework();
 
-class GFCoinsnap extends GFPaymentAddOn {
+class CoinsnapGF extends GFPaymentAddOn {
     
     private static $_instance = null;
-    protected $_version = '1.0.0';
-    protected $_min_gravityforms_version = '1.9.3';
+    protected $_version = COINSNAP_GF_VERSION;
+    protected $_min_gravityforms_version = COINSNAP_GF_MIN_VERSION;
     protected $_slug = 'gravityforms_coinsnap';
     protected $_path = 'gravityforms_coinsnap/coinsnap.php';
     protected $_full_path = __FILE__;
     protected $_url = 'http://www.gravityforms.com';
-    protected $_title = 'Gravity Forms Coinsnap Add-On';
+    protected $_title = 'Coinsnap for Gravity Forms';
     protected $_short_title = 'Coinsnap';
     protected $_supports_callbacks = true;
     protected $_capabilities = array('gravityforms_coinsnap', 'gravityforms_coinsnap_uninstall');    
@@ -23,26 +20,89 @@ class GFCoinsnap extends GFPaymentAddOn {
     protected $_capabilities_uninstall = 'gravityforms_coinsnap_uninstall';
     protected $_enable_rg_autoupgrade = false;
     protected $_config= [];
-    public const WEBHOOK_EVENTS = ['New','Expired','Settled','Processing'];
+    public const WEBHOOK_EVENTS = ['New','Expired','Settled','Processing'];	 
     
     public function __construct()
     {
         parent::__construct();
         $this->_config = get_option( 'gravityformsaddon_gravityforms_coinsnap_settings' );
+        
+        if (is_admin()) {
+            add_action( 'admin_enqueue_scripts', [ $this, 'connectionCheckScript' ] );
+            add_action( 'wp_ajax_coinsnap_connection_handler', [$this, 'coinsnapConnectionHandler'] );
+        }
     }
+    
     public static function get_instance()
     {
         if (self::$_instance == null) {
-            self::$_instance = new GFCoinsnap();
+            self::$_instance = new CoinsnapGF();
         }
         
         return self::$_instance;
     }
+    
+    public function connectionCheckScript(){
+        wp_register_style('coinsnap-backend-style', plugins_url('assets/css/coinsnap-backend-style.css',__FILE__),array(),COINSNAP_GF_VERSION);
+        wp_enqueue_style('coinsnap-backend-style');
+        wp_enqueue_script('coinsnap-connection-check',plugin_dir_url( __FILE__ ) . 'assets/js/connectionCheck.js',[ 'jquery' ],COINSNAP_GF_VERSION,true);
+        wp_add_inline_script( 'coinsnap-connection-check', 'var wc_secret = "'.wp_create_nonce().'";', 'before' );
+    }
+    
+    public function coinsnapConnectionHandler(){
+        
+        $_nonce = filter_input(INPUT_POST,'_wpnonce',FILTER_SANITIZE_STRING);
+        
+        if( wp_verify_nonce($_nonce) ){
+            $response = [
+                'result' => false,
+                'message' => __('Coinsnap connection error', COINSNAP_GF_PLUGIN_SLUG)
+            ];
+
+            try {
+                
+                $webhookExists = $this->webhookExists(
+                    $this->getApiKey(),
+                    $this->getStoreId(),
+                        $this->get_webhook_url()
+                );
+
+                if($webhookExists) {
+                    $response['result'] = true;
+                    $response['message'] = __('Coinsnap server is connected', COINSNAP_GF_PLUGIN_SLUG);
+                    $this->sendJsonResponse($response);
+                }
+
+                $webhook = $this->registerWebhook(
+                    $this->getStoreId(),
+                    $this->getApiKey(),
+                    $this->get_webhook_url()
+                );
+
+                $response['result'] = (bool)$webhook;
+                $response['message'] = $webhook 
+                    ? __('Coinsnap server is connected', COINSNAP_GF_PLUGIN_SLUG)
+                    : __('Coinsnap connection error', COINSNAP_GF_PLUGIN_SLUG);
+
+            }
+            catch (Exception $e) {
+                $response['message'] = $e->getMessage();
+            }
+
+            $this->sendJsonResponse($response);
+        }      
+    }
+
+    private function sendJsonResponse(array $response): void {
+        echo wp_json_encode($response);
+        exit();
+    }
+    
     public function pre_init() {        
-        add_action('wp', array('GFCoinsnap', 'maybe_thankyou_page'), 5);        
+        add_action('wp', array('CoinsnapGF', 'maybe_thankyou_page'), 5);        
     
         parent::pre_init();
-      }
+    }
 
     public static function maybe_thankyou_page()
     {
@@ -75,9 +135,8 @@ class GFCoinsnap extends GFPaymentAddOn {
         }
     }
 
-    public static function get_config_by_entry($entry)
-    {
-        $coinsnap = GFCoinsnap::get_instance();
+    public static function get_config_by_entry($entry){
+        $coinsnap = CoinsnapGF::get_instance();
         $feed    = $coinsnap->get_payment_feed($entry);
         if (empty($feed)) {
             return false;
@@ -87,7 +146,7 @@ class GFCoinsnap extends GFPaymentAddOn {
     }
 
     public static function get_config($form_id){
-        $coinsnap = GFCoinsnap::get_instance();
+        $coinsnap = CoinsnapGF::get_instance();
         $feed    = $coinsnap->get_feeds($form_id);        
         if ( ! $feed) {
             return false;
@@ -102,19 +161,19 @@ class GFCoinsnap extends GFPaymentAddOn {
         add_filter('gform_disable_notification', array($this, 'delay_notification'), 10, 4);
     }
     
-    public function billing_info_fields(){		
+    public function billing_info_fields() {		
 
 		return array(
 			array(
 				'name'       => 'email',
-				'label'      => __( 'Email address', 'gravityforms_coinsnap' ),
+				'label'      => __( 'Email address', 'coinsnap-for-gravityforms' ),
 				'field_type' => array( 'email' ),
                 'default_value' => '2',
 				'required'   => true,
 			),
 			array(
 				'name'       => 'full_name',
-				'label'      => __( 'Full Name', 'gravityforms_coinsnap' ),
+				'label'      => __( 'Full Name', 'coinsnap-for-gravityforms' ),
 				'field_type' => array( 'name', 'text' ),
                 'default_value' => '1',
 				'required'   => true,
@@ -126,58 +185,58 @@ class GFCoinsnap extends GFPaymentAddOn {
 
         $sts = GFCommon::get_entry_payment_statuses();
         
-        
         $statuses = [];
         foreach ($sts as $key => $val ){
             $statuses[] = array('label'=>$key, 'value'=>$val);
         }
         
-        $settings_fields     = array(array(
-            'title'       => esc_html__('Coinsnap Setting', 'gravityforms_coinsnap'),
-            'description' => '',
+        $settings_fields     = array(
+            array(
+            'title'       => esc_html__('Coinsnap Setting', 'coinsnap-for-gravityforms'),
+            'description' => '<div id="coinsnapConnectionStatus"><span class="success"></span></div>',
             'fields'      => array(               
             array(
                 'name'     => 'coinsnap_store_id',
-                'label'    => __('Store Id', 'gravityforms_coinsnap'),
+                'label'    => __('Store Id', 'coinsnap-for-gravityforms'),
                 'type'     => 'text',
                 'class'    => 'medium',
                 'required' => false,
-                'tooltip'  =>  __('Enter Your Coinsnap Store ID.','gravityforms_coinsnap')
+                'tooltip'  =>  __('Enter Your Coinsnap Store ID.','coinsnap-for-gravityforms')
             ),
             array(
                 'name'     => 'coinsnap_api_key',
-                'label'    => __('API Key', 'gravityforms_coinsnap'),
+                'label'    => __('API Key', 'coinsnap-for-gravityforms'),
                 'type'     => 'text',
                 'class'    => 'medium',                
                 'required' => false,
-                'tooltip'  =>  __('Enter Your Coinsnap API Key.','gravityforms_coinsnap')
+                'tooltip'  =>  __('Enter Your Coinsnap API Key.','coinsnap-for-gravityforms')
                 ),   
             array(
                 'name'     => 'coinsnap_expired_status',
-                'label'    => __('Expired Status', 'gravityforms_coinsnap'),
+                'label'    => __('Expired Status', 'coinsnap-for-gravityforms'),
                 'type'     => 'select',
                 'choices'  => $statuses,
                 'class'    => 'optin_select',                
                 'default_value' => 'Failed',
-                'tooltip'  =>  __('Select Expired Status.','gravityforms_coinsnap')
+                'tooltip'  =>  __('Select Expired Status.','coinsnap-for-gravityforms')
                ),                  
            array(
                 'name'     => 'coinsnap_settled_status',
-                'label'    => __('Settled Status', 'gravityforms_coinsnap'),
+                'label'    => __('Settled Status', 'coinsnap-for-gravityforms'),
                 'type'     => 'select',
                 'choices'  => $statuses,
                 'class'    => 'optin_select',                
                 'default_value' => 'Paid',
-                'tooltip'  =>  __('Select Settled Status.','gravityforms_coinsnap')
+                'tooltip'  =>  __('Select Settled Status.','coinsnap-for-gravityforms')
                ),      
            array(
               'name'     => 'coinsnap_processing_status',
-              'label'    => __('Processing Status', 'gravityforms_coinsnap'),
+              'label'    => __('Processing Status', 'coinsnap-for-gravityforms'),
               'type'     => 'select',
               'choices'  => $statuses,
               'class'    => 'optin_select',                
               'default_value' => 'Processing',
-              'tooltip'  =>  __('Select Processing Status.','gravityforms_coinsnap')
+              'tooltip'  =>  __('Select Processing Status.','coinsnap-for-gravityforms')
              ),   
                                                            
                
@@ -194,9 +253,11 @@ class GFCoinsnap extends GFPaymentAddOn {
         $settings = $this->get_plugin_settings();
         if ( ! rgar($settings, 'gf_coinsnap_configured')) {
             return sprintf(
-                    /* translators: 1: Link to settings page opening tag 2: Link to settings page closing tag */
-                    esc_html__('To get started, configure your %1$sCoinsnap Settings%2$s!', 'gravityforms_coinsnap'),
-                '<a href="' . admin_url('admin.php?page=gf_settings&subview=' . $this->_slug) . '">','</a>');
+                /* translators: 1: Link to settings page opening tag 2: Link to settings page closing tag */
+                __('To get started, configure your %1$sCoinsnap Settings%2$s!', 'coinsnap-for-gravityforms'),
+                '<a href="' . admin_url('admin.php?page=gf_settings&subview=' . $this->_slug) . '">',
+                '</a>'
+            );
         } else {
             return parent::feed_list_no_item_message();
         }
@@ -218,7 +279,7 @@ class GFCoinsnap extends GFPaymentAddOn {
 
     public function field_map_title()
     {
-        return __('Coinsnap Field', 'gravityforms_coinsnap');
+        return __('Coinsnap Field', 'coinsnap-for-gravityforms');
     }
 
 
@@ -230,23 +291,27 @@ class GFCoinsnap extends GFPaymentAddOn {
 
     
 
-    public function redirect_url($feed, $submission_data, $form, $entry){        
+    public function redirect_url($feed, $submission_data, $form, $entry)
+    {        
 
         //Don't process redirect url if request is a Coinsnap return
-        //if ( ! rgempty('gf_coinsnap_return', $_GET)){
-        if(null === filter_input(INPUT_GET,'gf_coinsnap_return')){
+        //if(filter_input(INPUT_GET,'gf_coinsnap_return',FILTER_SANITIZE_FULL_SPECIAL_CHARS )){
+        if(!rgempty(rgget('gf_coinsnap_return'))){
             return false;
         }
         
         $payment_amount = $submission_data['payment_amount'];
         $currency  = rgar( $entry, 'currency' );
+        
         $buyerEmail = $submission_data['email'];		
         $buyerName = $submission_data['full_name'];
-        $webhook_url = $this->get_webhook_url();
+
+        $webhook_url = $this->get_webhook_url();		
+        
 				
         if (! $this->webhookExists($this->getStoreId(), $this->getApiKey(), $webhook_url)){
             if (! $this->registerWebhook($this->getStoreId(), $this->getApiKey(),$webhook_url)) {                
-                echo (esc_html__('unable to set Webhook url.', 'gravityforms_coinsnap'));
+                echo (esc_html__('unable to set Webhook url.', 'coinsnap-for-gravityforms'));
                 exit;
             }
          }      
@@ -259,14 +324,11 @@ class GFCoinsnap extends GFPaymentAddOn {
 
         $invoice_no =  $entry['id'];		
 
-		$amount = round($payment_amount, 2);
-        
-              						    	
+	$amount = round($payment_amount, 2);    	
 
         $metadata = [];
         $metadata['orderNumber'] = $invoice_no;
         $metadata['customerName'] = $buyerName;
-				
 
         $checkoutOptions = new \Coinsnap\Client\InvoiceCheckoutOptions();
         $checkoutOptions->setRedirectURL( $return_url );
@@ -274,38 +336,29 @@ class GFCoinsnap extends GFPaymentAddOn {
         $camount = \Coinsnap\Util\PreciseNumber::parseFloat($amount,2);
 								
         $csinvoice = $client->createInvoice(
-				    $this->getStoreId(),  
-			    	strtoupper( $currency ),
-			    	$camount,
-			    	$invoice_no,
-			    	$buyerEmail,
-			    	$buyerName, 
-			    	$return_url,
-			    	COINSNAP_REFERRAL_CODE,     
-			    	$metadata,
-			    	$checkoutOptions
-		    	);
-				
+            $this->getStoreId(),  
+            strtoupper( $currency ),
+            $camount,
+            $invoice_no,
+            $buyerEmail,
+            $buyerName, 
+            $return_url,
+            COINSNAP_GF_REFERRAL_CODE,     
+            $metadata,
+            $checkoutOptions
+        );	
 		
         $payurl = $csinvoice->getData()['checkoutLink'] ;
-
-		
-
         return $payurl ;
     }
 
-
-        
-
-    public function return_url($form_id, $lead_id)
-    {
+    public function return_url($form_id, $lead_id){
         $pageURL     = GFCommon::is_ssl() ? 'https://' : 'http://';
-        $server_port = apply_filters('gform_coinsnap_return_url_port', filter_input('INPUT_SERVER','SERVER_PORT'));
+        $server_port = apply_filters('gform_coinsnap_return_url_port', filter_input(INPUT_SERVER,'SERVER_PORT', FILTER_SANITIZE_NUMBER_INT));
         if ($server_port != '80') {
-            $pageURL .= filter_input('INPUT_SERVER','SERVER_NAME') . ':' . $server_port . filter_input('INPUT_SERVER','REQUEST_URI');
-        }
-        else {
-            $pageURL .= filter_input('INPUT_SERVER','SERVER_NAME') . filter_input('INPUT_SERVER','REQUEST_URI');
+            $pageURL .= filter_input(INPUT_SERVER,'SERVER_NAME', FILTER_SANITIZE_FULL_SPECIAL_CHARS) . ':' . $server_port . filter_input(INPUT_SERVER,'REQUEST_URI', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        } else {
+            $pageURL .= filter_input(INPUT_SERVER,'SERVER_NAME', FILTER_SANITIZE_FULL_SPECIAL_CHARS) . filter_input(INPUT_SERVER,'REQUEST_URI', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         }
         $ids_query = "ids={$form_id}|{$lead_id}";
         $ids_query .= '&hash=' . wp_hash($ids_query);
@@ -356,16 +409,14 @@ class GFCoinsnap extends GFPaymentAddOn {
         return apply_filters('gform_coinsnap_get_payment_feed', $feed, $entry, $form);
     }
 
-    public function get_coinsnap_feed_by_entry($entry_id)
-    {
+    public function get_coinsnap_feed_by_entry($entry_id){
         $feed_id = gform_get_meta($entry_id, 'coinsnap_feed_id');
         $feed    = $this->get_feed($feed_id);
 
         return ! empty($feed) ? $feed : false;
     }
 
-    public function process_webhook()
-    {
+    public function process_webhook(){
      
         $notify_json = file_get_contents('php://input');        
 
@@ -374,15 +425,15 @@ class GFCoinsnap extends GFPaymentAddOn {
         $invoice_id = $notify_ar['invoiceId'];
 
         try {
-			$client = new \Coinsnap\Client\Invoice( $this->getApiUrl(), $this->getApiKey() );			
-			$csinvoice = $client->getInvoice($this->getStoreId(), $invoice_id);
-			$status = $csinvoice->getData()['status'] ;
-			$entry_id = $csinvoice->getData()['orderId'] ;				
-		
-		}catch (\Throwable $e) {													
-				echo "Error";
-				exit;
-		}
+            $client = new \Coinsnap\Client\Invoice( $this->getApiUrl(), $this->getApiKey() );			
+            $csinvoice = $client->getInvoice($this->getStoreId(), $invoice_id);
+            $status = $csinvoice->getData()['status'] ;
+            $entry_id = $csinvoice->getData()['orderId'] ;				
+	}
+        catch (\Throwable $e) {													
+            echo "Error";
+            exit;
+	}
 	
         
         $entry = GFAPI::get_entry( $entry_id );
@@ -423,25 +474,27 @@ class GFCoinsnap extends GFPaymentAddOn {
     
     public function update_feed_id($old_feed_id, $new_feed_id){
         global $wpdb;
-        //$wpdb->query($wpdb->prepare("UPDATE {$wpdb->prefix}rg_lead_meta SET meta_value=%s WHERE meta_key='coinsnap_feed_id' AND meta_value=%s",$new_feed_id,$old_feed_id));
-        $wpdb->update("{$wpdb->prefix}rg_lead_meta", array('meta_value' => $new_feed_id), array('meta_key' => 'coinsnap_feed_id','meta_value' => $old_feed_id),array('%s'),array('%s','%s'));
+        $sql = $wpdb->prepare(
+            "UPDATE {$wpdb->prefix}rg_lead_meta SET meta_value=%s WHERE meta_key='coinsnap_feed_id' AND meta_value=%s",
+            $new_feed_id,
+            $old_feed_id
+        );
+        $wpdb->query($sql);
     }
-
     
     public function update_payment_gateway(){
         global $wpdb;
-        //$wpdb->query($wpdb->prepare("UPDATE {$wpdb->prefix}rg_lead_meta SET meta_value=%s WHERE meta_key='payment_gateway' AND meta_value='coinsnap'", $this->_slug ));
-        $wpdb->update("{$wpdb->prefix}rg_lead_meta", array('meta_value' => $this->_slug), array('meta_key' => 'payment_gateway','meta_value' => 'coinsnap'),array('%s'),array('%s','%s'));
+        $sql = $wpdb->prepare(
+            "UPDATE {$wpdb->prefix}rg_lead_meta SET meta_value=%s WHERE meta_key='payment_gateway' AND meta_value='coinsnap'",
+            $this->_slug
+        );
+        $wpdb->query($sql);
     }
-
-    
-
-   
     
     public function get_webhook_url() {		
         return get_bloginfo('url') . '/?page=gf_coinsnap_webhook';
     }
-	public function getStoreId() {
+    public function getStoreId() {
         return $this->_config['coinsnap_store_id'];
     }
     public function getApiKey() {
@@ -478,7 +531,7 @@ class GFCoinsnap extends GFPaymentAddOn {
                 $webhook, //$url
                 self::WEBHOOK_EVENTS,   
                 null    //$secret
-            );		
+            );	
             
             return true;
         } catch (\Throwable $e) {
