@@ -56,7 +56,7 @@ class CoinsnapGF extends GFPaymentAddOn {
         if( wp_verify_nonce($_nonce) ){
             $response = [
                 'result' => false,
-                'message' => __('Coinsnap connection error', COINSNAP_GF_PLUGIN_SLUG)
+                'message' => __('Gravity Forms: Coinsnap connection error', COINSNAP_GF_PLUGIN_SLUG)
             ];
 
             try {
@@ -69,7 +69,7 @@ class CoinsnapGF extends GFPaymentAddOn {
 
                 if($webhookExists) {
                     $response['result'] = true;
-                    $response['message'] = __('Coinsnap server is connected', COINSNAP_GF_PLUGIN_SLUG);
+                    $response['message'] = __('Gravity Forms: Coinsnap server is connected', COINSNAP_GF_PLUGIN_SLUG);
                     $this->sendJsonResponse($response);
                 }
 
@@ -81,8 +81,8 @@ class CoinsnapGF extends GFPaymentAddOn {
 
                 $response['result'] = (bool)$webhook;
                 $response['message'] = $webhook 
-                    ? __('Coinsnap server is connected', COINSNAP_GF_PLUGIN_SLUG)
-                    : __('Coinsnap connection error', COINSNAP_GF_PLUGIN_SLUG);
+                    ? __('Gravity Forms: Coinsnap server is connected', COINSNAP_GF_PLUGIN_SLUG)
+                    : __('Gravity Forms: Coinsnap connection error', COINSNAP_GF_PLUGIN_SLUG);
 
             }
             catch (Exception $e) {
