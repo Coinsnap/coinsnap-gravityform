@@ -16,10 +16,10 @@
 
 Bitcoin and Lightning payment processing with the Coinsnap add-on for Gravity forms Wordpress plugin.
 
-* Coinsnap for Gravity Forms Demo Page: https://gravity.coinsnap.org/
-* Blog Article: https://coinsnap.io/en/coinsnap-for-gravity-forms/
-* WordPress: https://wordpress.org/plugins/coinsnap-for-gravityforms/
-* GitHub: https://github.com/Coinsnap/Coinsnap-for-Gravityforms
+* Coinsnap for Gravity Forms Demo Page: [https://gravity.coinsnap.org/](https://gravity.coinsnap.org/)
+* Blog Article: [https://coinsnap.io/coinsnap-for-gravity-forms/](https://coinsnap.io/coinsnap-for-gravity-forms/)
+* WordPress: [https://wordpress.org/plugins/coinsnap-for-gravityforms/](https://wordpress.org/plugins/coinsnap-for-gravityforms/)
+* GitHub: [https://github.com/Coinsnap/Coinsnap-for-Gravityforms](https://github.com/Coinsnap/Coinsnap-for-Gravityforms)
 
 # Description #
 
