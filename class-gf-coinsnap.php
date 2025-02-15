@@ -166,14 +166,14 @@ class CoinsnapGF extends GFPaymentAddOn {
 		return array(
 			array(
 				'name'       => 'email',
-				'label'      => __( 'Email address', 'coinsnap-for-gravityforms' ),
+				'label'      => __( 'Email address', 'coinsnap-for-gravity-forms' ),
 				'field_type' => array( 'email' ),
                 'default_value' => '2',
 				'required'   => true,
 			),
 			array(
 				'name'       => 'full_name',
-				'label'      => __( 'Full Name', 'coinsnap-for-gravityforms' ),
+				'label'      => __( 'Full Name', 'coinsnap-for-gravity-forms' ),
 				'field_type' => array( 'name', 'text' ),
                 'default_value' => '1',
 				'required'   => true,
@@ -192,51 +192,51 @@ class CoinsnapGF extends GFPaymentAddOn {
         
         $settings_fields     = array(
             array(
-            'title'       => esc_html__('Coinsnap Setting', 'coinsnap-for-gravityforms'),
+            'title'       => esc_html__('Coinsnap Setting', 'coinsnap-for-gravity-forms'),
             'description' => '<div id="coinsnapConnectionStatus"><span class="success"></span></div>',
             'fields'      => array(               
             array(
                 'name'     => 'coinsnap_store_id',
-                'label'    => __('Store Id', 'coinsnap-for-gravityforms'),
+                'label'    => __('Store Id', 'coinsnap-for-gravity-forms'),
                 'type'     => 'text',
                 'class'    => 'medium',
                 'required' => false,
-                'tooltip'  =>  __('Enter Your Coinsnap Store ID.','coinsnap-for-gravityforms')
+                'tooltip'  =>  __('Enter Your Coinsnap Store ID.','coinsnap-for-gravity-forms')
             ),
             array(
                 'name'     => 'coinsnap_api_key',
-                'label'    => __('API Key', 'coinsnap-for-gravityforms'),
+                'label'    => __('API Key', 'coinsnap-for-gravity-forms'),
                 'type'     => 'text',
                 'class'    => 'medium',                
                 'required' => false,
-                'tooltip'  =>  __('Enter Your Coinsnap API Key.','coinsnap-for-gravityforms')
+                'tooltip'  =>  __('Enter Your Coinsnap API Key.','coinsnap-for-gravity-forms')
                 ),   
             array(
                 'name'     => 'coinsnap_expired_status',
-                'label'    => __('Expired Status', 'coinsnap-for-gravityforms'),
+                'label'    => __('Expired Status', 'coinsnap-for-gravity-forms'),
                 'type'     => 'select',
                 'choices'  => $statuses,
                 'class'    => 'optin_select',                
                 'default_value' => 'Failed',
-                'tooltip'  =>  __('Select Expired Status.','coinsnap-for-gravityforms')
+                'tooltip'  =>  __('Select Expired Status.','coinsnap-for-gravity-forms')
                ),                  
            array(
                 'name'     => 'coinsnap_settled_status',
-                'label'    => __('Settled Status', 'coinsnap-for-gravityforms'),
+                'label'    => __('Settled Status', 'coinsnap-for-gravity-forms'),
                 'type'     => 'select',
                 'choices'  => $statuses,
                 'class'    => 'optin_select',                
                 'default_value' => 'Paid',
-                'tooltip'  =>  __('Select Settled Status.','coinsnap-for-gravityforms')
+                'tooltip'  =>  __('Select Settled Status.','coinsnap-for-gravity-forms')
                ),      
            array(
               'name'     => 'coinsnap_processing_status',
-              'label'    => __('Processing Status', 'coinsnap-for-gravityforms'),
+              'label'    => __('Processing Status', 'coinsnap-for-gravity-forms'),
               'type'     => 'select',
               'choices'  => $statuses,
               'class'    => 'optin_select',                
               'default_value' => 'Processing',
-              'tooltip'  =>  __('Select Processing Status.','coinsnap-for-gravityforms')
+              'tooltip'  =>  __('Select Processing Status.','coinsnap-for-gravity-forms')
              ),   
                                                            
                
@@ -254,7 +254,7 @@ class CoinsnapGF extends GFPaymentAddOn {
         if ( ! rgar($settings, 'gf_coinsnap_configured')) {
             return sprintf(
                 /* translators: 1: Link to settings page opening tag 2: Link to settings page closing tag */
-                __('To get started, configure your %1$sCoinsnap Settings%2$s!', 'coinsnap-for-gravityforms'),
+                __('To get started, configure your %1$sCoinsnap Settings%2$s!', 'coinsnap-for-gravity-forms'),
                 '<a href="' . admin_url('admin.php?page=gf_settings&subview=' . $this->_slug) . '">',
                 '</a>'
             );
@@ -279,7 +279,7 @@ class CoinsnapGF extends GFPaymentAddOn {
 
     public function field_map_title()
     {
-        return __('Coinsnap Field', 'coinsnap-for-gravityforms');
+        return __('Coinsnap Field', 'coinsnap-for-gravity-forms');
     }
 
 
@@ -311,7 +311,7 @@ class CoinsnapGF extends GFPaymentAddOn {
 				
         if (! $this->webhookExists($this->getStoreId(), $this->getApiKey(), $webhook_url)){
             if (! $this->registerWebhook($this->getStoreId(), $this->getApiKey(),$webhook_url)) {                
-                echo (esc_html__('unable to set Webhook url.', 'coinsnap-for-gravityforms'));
+                echo (esc_html__('unable to set Webhook url.', 'coinsnap-for-gravity-forms'));
                 exit;
             }
          }      

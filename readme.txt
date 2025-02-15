@@ -1,4 +1,4 @@
-=== Coinsnap for Gravity Forms ===
+=== Bitcoin payment for Gravity Forms ===
 Contributors: coinsnap
 Tags: Lightning, SATS, bitcoin, Gravity forms, payment gateway
 Tested up to: 	6.7
@@ -6,7 +6,7 @@ Stable tag: 	1.0.0
 License:	GPL2
 License URI:	https://www.gnu.org/licenses/gpl-2.0.html
 
-Bitcoin and Lightning payment processing with the Coinsnap add-on for Gravity forms Wordpress plugin.
+With this Bitcoin payment plugin for Gravity Forms you can now offer products, downloads, bookings or get donations in Bitcoin right in your forms!
 
 == Description ==
 
