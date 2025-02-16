@@ -12,7 +12,7 @@
  * Tested up to:    6.7
  * Requires at least: 5.2
  * GF requires at least: 1.9.3
- * GF tested up to: 2.9.2
+ * GF tested up to: 2.9.3
  * License:         GPL2
  * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
  *
